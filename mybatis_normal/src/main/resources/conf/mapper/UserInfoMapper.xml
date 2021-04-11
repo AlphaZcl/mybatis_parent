@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.zhuchl.mybatis.dao.mapper.UserInfoMapper">
+    <resultMap id="resMap" type="UserInfo">
+        <id column="sys_id" property="sysId"/>
+        <result column="phone_no" property="phoneNo"/>
+        <result column="user_acco" property="userAcco"/>
+        <result column="user_name" property="userName"/>
+        <result column="email" property="email"/>
+        <association property="address" javaType="Address">
+            <id column="address_id" property="addressId"/>
+            <result column="provice" property="provice"/>
+            <result column="city" property="city"/>
+            <result column="street" property="street"/>
+            <result column="eahouseaddress" property="eaHouseAddress"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="colleMap" type="UserInfo">
+        <id column="sys_id" property="sysId"/>
+        <result column="phone_no" property="phoneNo"/>
+        <result column="user_acco" property="userAcco"/>
+        <result column="user_name" property="userName"/>
+        <result column="email" property="email"/>
+        <collection property="adrs" ofType="Address">
+            <id column="address_id" property="addressId"/>
+            <result column="provice" property="provice"/>
+            <result column="city" property="city"/>
+            <result column="street" property="street"/>
+            <result column="eahouseaddress" property="eaHouseAddress"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="simpleResMap" type="UserInfo">
+        <id column="sys_id" property="sysId"/>
+        <result column="phone_no" property="phoneNo"/>
+        <result column="user_acco" property="userAcco"/>
+        <result column="user_name" property="userName"/>
+        <result column="email" property="email"/>
+        <association property="address" select="top.zhuchl.mybatis.dao.mapper.AddressMapper.findOne" column="user_acco"
+                     fetchType="lazy"/>
+    </resultMap>
+
+    <resultMap id="simpleResMap2" type="UserInfo">
+        <id column="sys_id" property="sysId"/>
+        <result column="phone_no" property="phoneNo"/>
+        <result column="user_acco" property="userAcco"/>
+        <result column="user_name" property="userName"/>
+        <result column="email" property="email"/>
+        <collection property="adrs" select="top.zhuchl.mybatis.dao.mapper.AddressMapper.findColl" column="user_acco"
+                    fetchType="lazy"/>
+    </resultMap>
+
+    <update id="updateUser">
+        UPDATE user_info
+        <bind name="_phoneNo" value="'+86'+phoneNo"/>
+        <set>
+            <if test="userName!=null and !userName.equals('')">
+                user_name = #{userName},
+            </if>
+            <if test="phoneNo != null and phoneNo.length()&lt;13 and phoneNo.length()&gt;=11">
+                phone_no=#{_phoneNo}
+            </if>
+        </set>
+        <where>
+            user_acco = #{userAcco}
+        </where>
+    </update>
+
+    <sql id="userInfo_column">
+        sys_id,user_acco,user_name,phone_no,email
+    </sql>
+
+    <select id="findOne" resultMap="resMap">
+        SELECT <include refid="userInfo_column"/>
+        FROM user_info
+        WHERE SYS_ID = #{id}
+    </select>
+    <!--    <select id="findOne" resultType="UserInfo" >-->
+    <!--        SELECT * FROM  user_info WHERE SYS_ID = #{id}-->
+    <!--    </select>-->
+
+    <select id="findOneByU" resultType="UserInfo">
+        SELECT *
+        FROM USER_INFO
+        WHERE SYS_ID = #{id}
+          AND USER_ACCO = #{userAcco,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findOneByMultiP" resultType="UserInfo">
+        SELECT *
+        FROM user_info
+        WHERE sys_id = #{id,jdbcType=INTEGER}
+          AND user_acco = #{param2}
+          AND phone_no = #{arg2.phoneNo}
+    </select>
+
+    <select id="findAll" resultType="top.zhuchl.mybatis.dao.entity.UserInfo">
+        SELECT *
+        FROM user_info
+    </select>
+
+    <select id="findAllRtMap" resultType="UserInfo">
+        SELECT *
+        FROM user_info
+    </select>
+
+    <select id="findUserInfoWithAddr" resultType="UserInfo" resultMap="resMap">
+        SELECT u.*, adr.*
+        FROM user_info u
+                 LEFT OUTER JOIN address_info adr
+                                 ON u.user_acco = adr.user_acco
+        WHERE u.sys_id = #{id}
+          AND u.user_Acco = #{userAcco}
+    </select>
+
+    <select id="findCollection" resultMap="colleMap">
+        SELECT u.*, adr.*
+        FROM user_info u
+                 LEFT OUTER JOIN address_info adr
+                                 ON u.user_acco = adr.user_acco
+        WHERE u.user_acco = #{userAcco}
+    </select>
+
+    <select id="findBySimple" resultMap="simpleResMap2">
+        SELECT <include refid="userInfo_column"/> FROM user_info
+        <trim prefix="WHERE" suffixOverrides="AND">
+            <if test="sysId !=null">
+                sys_id = #{sysId} AND
+            </if>
+            <if test="userAcco!=null and !userAcco.equals('')">
+                user_acco = #{userAcco} AND
+            </if>
+        </trim>
+    </select>
+
+    <select id="findMore" resultMap="colleMap">
+        SELECT u.*,adr.* FROM user_info u
+        LEFT OUTER JOIN address_info adr
+        ON u.user_acco=adr.user_acco
+        WHERE u.user_acco IN
+        <foreach collection="params" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findMore2" resultMap="colleMap">
+        SELECT u.*, adr.*
+        FROM user_info u
+        LEFT OUTER JOIN address_info adr
+        ON u.user_acco = adr.user_acco
+        <where>
+            <choose>
+                <when test="id != null">
+                    AND u.sys_id = #{id}
+                </when>
+                <when test="userAcco!= null">
+                    AND u.user_acco = #{userAcco}
+                </when>
+                <otherwise>
+                    AND 1=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="sysId">
+        INSERT INTO user_info(user_acco, user_name, phone_no, email)
+        VALUES (#{userAcco}, #{userName}, #{phoneNo}, #{email})
+    </insert>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="sysId">
+        <selectKey order="BEFORE" keyProperty="userAcco" resultType="String">
+            SELECT MAX(sys_id)+1 FROM user_info
+        </selectKey>
+        INSERT INTO user_info(user_acco,user_name,phone_no,email)
+        VALUES(#{userAcco},#{userName},#{phoneNo},#{email})
+    </insert>
+
+
+</mapper>

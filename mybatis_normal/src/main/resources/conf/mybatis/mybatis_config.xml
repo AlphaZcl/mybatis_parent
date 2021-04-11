@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!--引入外部配置文件-->
+    <properties  resource="conf/properties/jdbc.properties"/>
+
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--按需加载-->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!--延迟加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
+    <typeAliases>
+        <package name="top.zhuchl.mybatis.dao.entity"/>
+<!--        <typeAlias type="top.zhuchl.mybatis.dao.entity.UserInfo" alias="UserInfo"/>-->
+    </typeAliases>
+
+<!--    <plugins>-->
+<!--        <plugin interceptor=""></plugin>-->
+<!--    </plugins>-->
+
+<!--    <typeHandlers>-->
+<!--        <typeHandler handler="" />-->
+<!--    </typeHandlers>-->
+    <!-- mybatis框架的个性化配置可在此配置 -->
+    <environments default="dev">
+        <environment id="dev">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${mysql.driver}"/>
+                <property name="url" value="${mysql.url}"/>
+                <property name="username" value="${mysql.username}"/>
+                <property name="password" value="${mysql.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--数据库移植-->
+    <databaseIdProvider type="DB_VENDOR">
+        <property name="MySql" value="mysql"/>
+        <property name="Oracle" value="Oracle"/>
+        <property name="DB2" value="DB2"/>
+    </databaseIdProvider>
+
+    <!--MyBatis默认不知道对应接口的mapper文件，需要注册到mappers-->
+    <mappers>
+        <mapper resource="conf/mapper/UserInfoMapper.xml"/>
+        <mapper resource="conf/mapper/AddressMapper.xml"/>
+<!--        <package name="top.zhuchl.mybatis.dao.mapper"/>-->
+<!--        <mapper class="top.zhuchl.mybatis.dao.mapper.UserInfoMapper"/>-->
+    </mappers>
+    
+
+</configuration>

@@ -16,12 +16,54 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <!--mybatis 支持包-->
+        <org.mybatis.mybatis.version>3.5.6</org.mybatis.mybatis.version>
+        <!--mysql连接驱动-->
+        <mysql.mysql.connector.java.version>5.1.45</mysql.mysql.connector.java.version>
+        <!--mybatis缓存-->
+        <mybatis.ehcache.version>1.2.1</mybatis.ehcache.version>
+        <!--单元测试-->
+        <junit.junit.version>4.12</junit.junit.version>
+        <!--日志支持包-->
+        <log4j.version>1.2.17</log4j.version>
+        <slf4j.log4j12.version>1.6.2</slf4j.log4j12.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${org.mybatis.mybatis.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.mysql.connector.java.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.junit.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.caches</groupId>
+                <artifactId>mybatis-ehcache</artifactId>
+                <version>${mybatis.ehcache.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.log4j12.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
 </project>
